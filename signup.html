@@ -93,18 +93,23 @@
 
 <script>
 function signup() {
-    const name = name.value.trim();
-    const email = email.value.trim();
-    const pass = password.value.trim();
+    const nameVal = document.getElementById("name").value.trim();
+    const emailVal = document.getElementById("email").value.trim();
+    const passVal = document.getElementById("password").value.trim();
 
-    if (!name || !email || !pass) return alert("Fill all fields.");
+    if (!nameVal || !emailVal || !passVal) {
+        alert("Fill all fields.");
+        return;
+    }
 
     let users = JSON.parse(localStorage.getItem("users")) || [];
 
-    if (users.some(u => u.email === email))
-        return alert("Email already exists.");
+    if (users.some(u => u.email === emailVal)) {
+        alert("Email already exists.");
+        return;
+    }
 
-    users.push({ name, email, password: pass });
+    users.push({ name: nameVal, email: emailVal, password: passVal });
     localStorage.setItem("users", JSON.stringify(users));
 
     alert("Account created successfully!");
@@ -114,3 +119,4 @@ function signup() {
 
 </body>
 </html>
+
