@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        margin: 0;
+        font-family: "Inter", sans-serif;
+        background: #0f0f0f;
+        color: white;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px 0;
+    }
+
+    h2 {
+        font-weight: 500;
+        margin-bottom: 25px;
+        text-align: center;
+    }
+
+    .btn {
+        padding: 15px 34px;
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 18px;
+        cursor: pointer;
+        transition: 0.2s;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    }
+
+    .btn:hover {
+        background: #1e4ed8;
+    }
+
+    #batteryContainer {
+        margin-top: 40px;
+        width: 100%;
+        max-width: 500px;
+        display: none;
+        overflow: visible !important;
+        flex-shrink: 0;
+        animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+</head>
+<body>
+
+<h2>Welcome 👋</h2>
+
+<button class="btn" onclick="showBattery()">How Battery Charging Happens</button>
+
+<div id="batteryContainer"></div>
+
+<script>
+function showBattery() {
+    const container = document.getElementById("batteryContainer");
+
+    // prevent reloading twice
+    if (container.innerHTML.trim() !== "") {
+        container.style.display = "block";
+        return;
+    }
+
+    container.style.display = "block";
+
+    // inject modern battery animation
+    container.innerHTML = `
+        <div style="text-align:center;">
+            <div id="percent" style="font-size:34px;font-weight:600;margin-bottom:18px;">0%</div>
+
+            <div class="battery-container" style="width:260px;height:500px;margin:0 auto;position:relative;">
+                <div class="battery-outline" style="width:100%;height:100%;border:8px solid white;border-radius:18px;position:relative;"></div>
+                <div id="grid" style="position:absolute;top:12px;left:12px;right:12px;bottom:12px;
+                                     display:grid;grid-template-columns:repeat(6,1fr);
+                                     grid-template-rows:repeat(14,1fr);gap:6px;align-items:center;justify-items:center;">
+                </div>
+            </div>
+
+            <div id="charged" style="margin-top:18px;font-size:22px;color:#8f8;font-weight:500;opacity:0;transition:0.4s;">
+                Battery Fully Charged
+            </div>
+        </div>
+    `;
+
+    startBatteryAnimation();
+}
+
+function startBatteryAnimation() {
+    const cols = 6;
+    const rows = 14;
+    const total = cols * rows;
+
+    const grid = document.getElementById("grid");
+    const percentText = document.getElementById("percent");
+    const chargedMsg = document.getElementById("charged");
+
+    let dots = [];
+
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            const dot = document.createElement("div");
+            dot.style.width = "20px";
+            dot.style.height = "20px";
+            dot.style.background = "#333";
+            dot.style.borderRadius = "50%";
+            dot.dataset.row = r;
+
+            dots.push(dot);
+            grid.appendChild(dot);
+        }
+    }
+
+    function rowColor(r) {
+        if (r >= rows - 4) return "#20c020";
+        if (r >= rows - 9) return "#e6e600";
+        return "#d02020";
+    }
+
+    let seq = [];
+    for (let r = rows - 1; r >= 0; r--) {
+        for (let c = 0; c < cols; c++) {
+            seq.push(dots[r * cols + c]);
+        }
+    }
+
+    let index = 0;
+
+    function updatePercent() {
+        const p = Math.floor((index / total) * 100);
+        percentText.textContent = p + "%";
+        if (p >= 100) chargedMsg.style.opacity = 1;
+    }
+
+    function fill() {
+        if (index >= total) return;
+
+        const dot = seq[index];
+        const r = parseInt(dot.dataset.row);
+
+        dot.style.background = rowColor(r);
+
+        index++;
+        updatePercent();
+        setTimeout(fill, 100);
+    }
+
+    fill();
+}
+</script>
+
+</body>
+</html>
+
+
+
+<!--<!DOCTYPE html>
+<html>
+<head>
+<title>Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        margin: 0;
+        font-family: "Inter", sans-serif;
+        background: #0f0f0f;
+        color: white;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px 0;
+    }
+
+    h2 {
+        font-weight: 500;
+        margin-bottom: 25px;
+    }
+
+    .btn {
+        padding: 15px 34px;
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 18px;
+        cursor: pointer;
+        transition: 0.2s;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    }
+
+    .btn:hover { background: #1d4ed8; }
+
+    #batteryContainer {
+        margin-top: 40px;
+        display: none;
+
+        /* FIXES */
+        width: 100%;
+        max-width: 450px;
+        overflow: visible !important;
+        flex-shrink: 0;
+    }
+</style>
+
+</head>
+
+<body>
+
+<h2>Welcome 👋</h2>
+
+<button class="btn" onclick="showBattery()">How Battery Charging Happens</button>
+
+<iframe id="batteryFrame" src=""></iframe>
+
+<script>
+function showBattery() {
+    const frame = document.getElementById("batteryFrame");
+    frame.src = "battery.html";   // loads entire page including JS
+    frame.style.display = "block";
+}
+</script>
+
+</body>
+</html>
+
+
+<!--<!DOCTYPE html>
+<html>
+<head>
+<title>Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        margin: 0;
+        font-family: "Inter", sans-serif;
+        background: #0f0f0f;
+        color: white;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 60px;
+    }
+
+    h2 {
+        font-weight: 500;
+        margin-bottom: 25px;
+    }
+
+    .btn {
+        padding: 16px 36px;
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 18px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: 0.3s;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+    }
+
+    .btn:hover { background: #184dc6; }
+
+    #batteryFrame {
+        margin-top: 40px;
+        width: 350px;
+        height: 600px;
+        border: none;
+        display: none;     /* hidden at first */
+    }
+</style>
+
+</head>
+
+<body>
+
+<h2>Welcome 👋</h2>
+
+<button class="btn" onclick="showBattery()">How Battery Charging Happens</button>
+
+<iframe id="batteryFrame" src=""></iframe>
+
+<script>
+function showBattery() {
+    const frame = document.getElementById("batteryFrame");
+    frame.src = "battery.html";   // loads entire page including JS
+    frame.style.display = "block";
+}
+</script>
+
+</body>
+</html>
+
+
